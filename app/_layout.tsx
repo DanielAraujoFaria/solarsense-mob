@@ -1,38 +1,41 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
+import { useState, useEffect } from 'react';
+import { useColorScheme } from 'react-native';
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth } from '../services/firebaseConfig'; 
+import LoginScreen from '@/screens/LoginScreen';
+import { ThemeProvider, DarkTheme, DefaultTheme } from '@react-navigation/native';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
-import 'react-native-reanimated';
-
-import { useColorScheme } from '@/hooks/useColorScheme';
-
-// Prevent the splash screen from auto-hiding before asset loading is complete.
-SplashScreen.preventAutoHideAsync();
+import DashboardScreen from '@/screens/DashboardScreen'; 
 
 export default function RootLayout() {
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
   const colorScheme = useColorScheme();
-  const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-  });
 
   useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
-    }
-  }, [loaded]);
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setIsAuthenticated(true); 
+      } else {
+        setIsAuthenticated(false); 
+      }
+      setLoading(false); 
+    });
 
-  if (!loaded) {
-    return null;
+    return () => unsubscribe(); 
+  }, []);
+
+  if (loading) {
+    return null; 
+  }
+
+  if (!isAuthenticated) {
+    return <LoginScreen />; 
   }
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
+      <DashboardScreen /> {}
       <StatusBar style="auto" />
     </ThemeProvider>
   );
