@@ -1,13 +1,17 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
 
-const data = [{ id: '1', name: 'Item 1' }, { id: '2', name: 'Item 2' }];
-
 interface ListScreenProps {
   onBack: () => void;
+  data: { id: string; name: string }[];  // Dados passados como prop
+  onDelete: (id: string) => void; // Função para apagar o item
 }
 
-export default function ListScreen({ onBack }: ListScreenProps) {
+export default function ListScreen({ onBack, data, onDelete }: ListScreenProps) {
+  const handleDelete = (id: string) => {
+    onDelete(id); // Chama a função de delete
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Lista de Itens</Text>
@@ -17,13 +21,13 @@ export default function ListScreen({ onBack }: ListScreenProps) {
         renderItem={({ item }) => (
           <View style={styles.item}>
             <Text style={styles.itemText}>{item.name}</Text>
-            <TouchableOpacity style={styles.button} onPress={() => {}}>
-              <Text style={styles.buttonText}>Detalhes</Text>
+            <TouchableOpacity style={styles.deleteButton} onPress={() => handleDelete(item.id)}>
+              <Text style={styles.buttonText}>Apagar</Text>
             </TouchableOpacity>
           </View>
         )}
       />
-      <TouchableOpacity style={styles.button} onPress={onBack}>
+      <TouchableOpacity style={styles.backButton} onPress={onBack}>
         <Text style={styles.buttonText}>Voltar</Text>
       </TouchableOpacity>
     </View>
@@ -58,11 +62,19 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
-  button: {
-    backgroundColor: '#5CF56B',
+  deleteButton: {
+    backgroundColor: '#F56B5C',  // Cor do botão "Apagar" vermelho
     paddingVertical: 8,
     paddingHorizontal: 20,
     borderRadius: 8,
+  },
+  backButton: {
+    backgroundColor: '#5CF56B',  // Cor do botão "Voltar" verde
+    paddingVertical: 12,
+    paddingHorizontal: 30,
+    margin: 10,
+    borderRadius: 8,
+    alignItems: 'center',
   },
   buttonText: {
     color: '#fff',

@@ -1,21 +1,33 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
 
 interface InsertDataScreenProps {
   onBack: () => void;
+  onSave: (name: string) => void;  // Função para salvar os dados
 }
 
-export default function InsertDataScreen({ onBack }: InsertDataScreenProps) {
+export default function InsertDataScreen({ onBack, onSave }: InsertDataScreenProps) {
+  const [inputValue, setInputValue] = useState('');
+
+  const handleSave = () => {
+    if (inputValue.trim() !== '') {
+      onSave(inputValue);  // Chama a função onSave passando o valor do input
+      setInputValue('');  // Limpa o input após salvar
+    }
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Inserir Dados</Text>
       <TextInput
         style={styles.input}
+        value={inputValue}
+        onChangeText={setInputValue}
         placeholder="Digite algo aqui"
         placeholderTextColor="#888"
       />
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} onPress={() => {}}>
+        <TouchableOpacity style={styles.button} onPress={handleSave}>
           <Text style={styles.buttonText}>Salvar</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.button} onPress={onBack}>

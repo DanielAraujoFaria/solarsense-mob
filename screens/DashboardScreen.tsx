@@ -5,14 +5,24 @@ import InsertDataScreen from './InsertDataScreen';
 import EditScreen from './EditScreen';
 
 export default function DashboardScreen() {
-  const [screen, setScreen] = useState('dashboard'); 
+  const [screen, setScreen] = useState('dashboard');
+  const [data, setData] = useState<{ id: string; name: string }[]>([]);
 
-  const handleIniciar = (screenName) => {
-    setScreen(screenName); 
+  const handleIniciar = (screenName: string) => {
+    setScreen(screenName);
   };
 
   const handleBack = () => {
-    setScreen('dashboard'); 
+    setScreen('dashboard');
+  };
+
+  const handleSave = (name: string) => {
+    const newItem = { id: Date.now().toString(), name }; // Gerando um id único com base no timestamp
+    setData((prevData) => [...prevData, newItem]); // Adicionando o novo item à lista
+  };
+
+  const handleDelete = (id: string) => {
+    setData((prevData) => prevData.filter((item) => item.id !== id)); // Removendo o item da lista
   };
 
   return (
@@ -31,9 +41,9 @@ export default function DashboardScreen() {
           </TouchableOpacity>
         </>
       ) : screen === 'list' ? (
-        <ListScreen onBack={handleBack} />
+        <ListScreen onBack={handleBack} data={data} onDelete={handleDelete} />
       ) : screen === 'insert' ? (
-        <InsertDataScreen onBack={handleBack} />
+        <InsertDataScreen onBack={handleBack} onSave={handleSave} />
       ) : screen === 'edit' ? (
         <EditScreen onBack={handleBack} />
       ) : null}
