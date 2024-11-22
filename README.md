@@ -1,5 +1,5 @@
 
-# Solar Sense Mob - GLOBAL
+# Solar Sense Mobile - GLOBAL
 
 O **Solar Sense** é um produto inovador que permite aos consumidores monitorar a eficiência e o desempenho de painéis solares em suas propriedades. Através de uma plataforma intuitiva, ele oferece informações em tempo real, permitindo ajustes para maximizar a produção de energia e garantir a manutenção preventiva dos sistemas solares.
 
