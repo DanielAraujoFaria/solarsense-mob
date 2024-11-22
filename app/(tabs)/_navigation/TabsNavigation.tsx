@@ -1,4 +1,3 @@
-// app/_navigation/TabsNavigation.tsx
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import DashboardScreen from '../../../screens/DashboardScreen';

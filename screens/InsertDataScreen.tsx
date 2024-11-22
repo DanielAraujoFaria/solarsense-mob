@@ -3,7 +3,7 @@ import { View, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-nativ
 
 interface InsertDataScreenProps {
   onBack: () => void;
-  onSave: (name: string) => void;  // Função para salvar os dados
+  onSave: (name: string) => void;  
 }
 
 export default function InsertDataScreen({ onBack, onSave }: InsertDataScreenProps) {
@@ -11,8 +11,8 @@ export default function InsertDataScreen({ onBack, onSave }: InsertDataScreenPro
 
   const handleSave = () => {
     if (inputValue.trim() !== '') {
-      onSave(inputValue);  // Chama a função onSave passando o valor do input
-      setInputValue('');  // Limpa o input após salvar
+      onSave(inputValue);  
+      setInputValue('');  
     }
   };
 

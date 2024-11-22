@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, TextInput, Alert, StyleSheet, Text, TouchableOpacity, ScrollView } from 'react-native';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '@/services/firebaseConfig';
-import LoginScreen from './LoginScreen';  // Importando a LoginScreen
+import LoginScreen from './LoginScreen'; 
 
 export default function SignUpScreen() {
   const [email, setEmail] = useState('');
@@ -10,7 +10,7 @@ export default function SignUpScreen() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [isSignedUp, setIsSignedUp] = useState(false);
-  const [showLoginScreen, setShowLoginScreen] = useState(false);  // Estado para controlar a tela exibida
+  const [showLoginScreen, setShowLoginScreen] = useState(false);  
 
   const handleSignUp = async () => {
     if (loading) return;
@@ -33,7 +33,7 @@ export default function SignUpScreen() {
   };
 
   if (showLoginScreen || isSignedUp) {
-    return <LoginScreen />;  // Mostra a LoginScreen quando o estado for true
+    return <LoginScreen />; 
   }
 
   return (
@@ -80,11 +80,11 @@ export default function SignUpScreen() {
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    justifyContent: 'flex-start',  // Alinhar o conteúdo para começar do topo
+    justifyContent: 'flex-start', 
     alignItems: 'center',
     backgroundColor: '#f4f4f4',
     padding: 20,
-    paddingTop: 50,  // Um pouco mais de espaço no topo
+    paddingTop: 50, 
   },
   title: {
     fontSize: 24,
@@ -92,15 +92,15 @@ const styles = StyleSheet.create({
     marginBottom: 40,
     color: '#333',
     width: '100%',
-    textAlign: 'center',  // Centralizar o título
+    textAlign: 'center', 
   },
   input: {
-    height: 50,  // Aumenta a altura para melhor usabilidade
-    width: '100%',  // Largura 100% para ocupar toda a tela
+    height: 50,  
+    width: '100%',  
     borderColor: '#ccc',
     borderWidth: 1,
     marginBottom: 20,
-    paddingLeft: 15,  // Aumentando o padding para dar mais espaço no input
+    paddingLeft: 15, 
     borderRadius: 8,
     fontSize: 16,
   },
@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: 'center',
     width: '100%',
-    marginTop: 20,  // Mais espaço entre os campos e o botão
+    marginTop: 20,  
   },
   buttonDisabled: {
     backgroundColor: '#ccc',

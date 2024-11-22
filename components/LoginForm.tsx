@@ -1,4 +1,3 @@
-// app/components/LoginForm.tsx
 import React from 'react';
 import { TextInput, Button } from 'react-native';
 

@@ -3,13 +3,13 @@ import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import ListScreen from './ListScreen';
 import InsertDataScreen from './InsertDataScreen';
 import EditScreen from './EditScreen';
-import LoginScreen from './LoginScreen'; // Importa a tela de Login
-import { auth } from '../services/firebaseConfig'; // Importa o Firebase auth
+import LoginScreen from './LoginScreen'; 
+import { auth } from '../services/firebaseConfig'; 
 import { database, ref, set, get, remove } from '../services/firebaseConfig';
 
 export default function DashboardScreen() {
   const [screen, setScreen] = useState('dashboard');
-  const [loggedIn, setLoggedIn] = useState(true); // Controle de login
+  const [loggedIn, setLoggedIn] = useState(true); 
   const [data, setData] = useState<{ id: string; name: string }[]>([]);
   const [currentItem, setCurrentItem] = useState<{ id: string; name: string } | null>(null);
 
@@ -36,8 +36,8 @@ export default function DashboardScreen() {
 
   const handleLogout = async () => {
     try {
-      await auth.signOut(); // Firebase sign-out
-      setLoggedIn(false); // Redireciona para LoginScreen
+      await auth.signOut(); 
+      setLoggedIn(false);
     } catch (error) {
       Alert.alert('Erro', 'Não foi possível sair da conta.');
       console.error('Error logging out:', error);
@@ -45,7 +45,6 @@ export default function DashboardScreen() {
   };
 
   if (!loggedIn) {
-    // Redireciona para o LoginScreen
     return <LoginScreen />;
   }
 
