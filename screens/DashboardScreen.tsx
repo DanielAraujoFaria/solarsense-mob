@@ -1,76 +1,91 @@
+// DashboardScreen.tsx
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import ListScreen from './ListScreen';
 import InsertDataScreen from './InsertDataScreen';
 import EditScreen from './EditScreen';
-import { database, ref, set, get, child, remove } from '../services/firebaseConfig';
+import { database, ref, set, get, remove } from '../services/firebaseConfig'; // Importando corretamente
+
 
 export default function DashboardScreen() {
   const [screen, setScreen] = useState('dashboard');
   const [data, setData] = useState<{ id: string; name: string }[]>([]);
+  const [currentItem, setCurrentItem] = useState<{ id: string; name: string } | null>(null);
 
-  // Função para mudar a tela
+  // Carregar dados do Firebase
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const dataRef = ref(database, 'items');
+        const snapshot = await get(dataRef);
+        if (snapshot.exists()) {
+          const items = snapshot.val();
+          const formattedData = Object.keys(items).map((key) => ({
+            id: key,
+            name: items[key].name,
+          }));
+          setData(formattedData);
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // Navegar para a tela desejada
   const handleIniciar = (screenName: string) => {
     setScreen(screenName);
   };
 
-  // Função para voltar ao dashboard
+  // Voltar para a tela inicial
   const handleBack = () => {
     setScreen('dashboard');
   };
 
-  // Função para salvar um novo item no Firebase
-  const handleSave = (name: string) => {
+  // Salvar novo item no Firebase
+  const handleSave = async (name: string) => {
     const newItem = { name };
-    const newItemRef = ref(database, 'items/' + Date.now()); // Criando uma referência única
-    set(newItemRef, newItem) // Salvando o novo item no Firebase
-      .then(() => {
-        console.log('Item salvo com sucesso!');
-        setData((prevData) => [
-          ...prevData,
-          { id: newItemRef.key!, name }, // Adiciona o item à lista local
-        ]);
-      })
-      .catch((error) => {
-        console.error('Erro ao salvar item: ', error);
-      });
-  };
-
-  // Função para deletar um item do Firebase
-  const handleDelete = (id: string) => {
-    const itemRef = ref(database, 'items/' + id); // Referência para o item específico
-    remove(itemRef) // Deleta o item
-      .then(() => {
-        console.log('Item removido com sucesso');
-        setData((prevData) => prevData.filter((item) => item.id !== id)); // Atualiza a lista local
-      })
-      .catch((error) => {
-        console.error('Erro ao remover item: ', error);
-      });
-  };
-
-  // Carregar os dados do Firebase quando a tela de lista for aberta
-  useEffect(() => {
-    if (screen === 'list') {
-      const itemsRef = ref(database, 'items');
-      get(itemsRef)
-        .then((snapshot) => {
-          if (snapshot.exists()) {
-            const data = snapshot.val();
-            const itemsArray = Object.keys(data).map((key) => ({
-              id: key,
-              name: data[key].name,
-            }));
-            setData(itemsArray);
-          } else {
-            console.log('Nenhum dado encontrado!');
-          }
-        })
-        .catch((error) => {
-          console.error('Erro ao obter os dados: ', error);
-        });
+    try {
+      const newRef = ref(database, 'items/' + Date.now().toString());
+      await set(newRef, newItem);
+      setData((prevData) => [...prevData, { id: Date.now().toString(), name }]);
+    } catch (error) {
+      console.error('Error saving data:', error);
     }
-  }, [screen]);
+  };
+
+  // Deletar item do Firebase
+  const handleDelete = async (id: string) => {
+    try {
+      const itemRef = ref(database, 'items/' + id);
+      await remove(itemRef);
+      setData((prevData) => prevData.filter((item) => item.id !== id));
+    } catch (error) {
+      console.error('Error deleting item:', error);
+    }
+  };
+
+  // Editar item no Firebase
+  const handleEdit = (item: { id: string; name: string }) => {
+    setCurrentItem(item);
+    setScreen('edit');
+  };
+
+  const handleUpdate = async (id: string, name: string) => {
+    try {
+      const itemRef = ref(database, 'items/' + id);
+      await set(itemRef, { name });
+      const updatedData = data.map((item) =>
+        item.id === id ? { ...item, name } : item
+      );
+      setData(updatedData);
+      setScreen('list');
+    } catch (error) {
+      console.error('Error updating data:', error);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -88,11 +103,11 @@ export default function DashboardScreen() {
           </TouchableOpacity>
         </>
       ) : screen === 'list' ? (
-        <ListScreen onBack={handleBack} data={data} onDelete={handleDelete} />
+        <ListScreen onBack={handleBack} data={data} onDelete={handleDelete} onEdit={handleEdit} />
       ) : screen === 'insert' ? (
         <InsertDataScreen onBack={handleBack} onSave={handleSave} />
-      ) : screen === 'edit' ? (
-        <EditScreen onBack={handleBack} />
+      ) : screen === 'edit' && currentItem ? (
+        <EditScreen onBack={handleBack} item={currentItem} onUpdate={handleUpdate} />
       ) : null}
     </View>
   );

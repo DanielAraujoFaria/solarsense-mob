@@ -5,11 +5,16 @@ interface ListScreenProps {
   onBack: () => void;
   data: { id: string; name: string }[];  // Dados passados como prop
   onDelete: (id: string) => void; // Função para apagar o item
+  onEdit: (item: { id: string; name: string }) => void; // Função para editar o item
 }
 
-export default function ListScreen({ onBack, data, onDelete }: ListScreenProps) {
+export default function ListScreen({ onBack, data, onDelete, onEdit }: ListScreenProps) {
   const handleDelete = (id: string) => {
-    onDelete(id); // Chama a função de delete que foi passada como prop
+    onDelete(id); // Chama a função de delete
+  };
+
+  const handleEdit = (item: { id: string; name: string }) => {
+    onEdit(item); // Chama a função de editar
   };
 
   return (
@@ -21,9 +26,14 @@ export default function ListScreen({ onBack, data, onDelete }: ListScreenProps) 
         renderItem={({ item }) => (
           <View style={styles.item}>
             <Text style={styles.itemText}>{item.name}</Text>
-            <TouchableOpacity style={styles.deleteButton} onPress={() => handleDelete(item.id)}>
-              <Text style={styles.buttonText}>Apagar</Text>
-            </TouchableOpacity>
+            <View style={styles.buttonsContainer}>
+              <TouchableOpacity style={styles.deleteButton} onPress={() => handleDelete(item.id)}>
+                <Text style={styles.buttonText}>Apagar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.editButton} onPress={() => handleEdit(item)}>
+                <Text style={styles.buttonText}>Editar</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         )}
       />
@@ -62,14 +72,24 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
+  buttonsContainer: {
+    flexDirection: 'row',
+  },
   deleteButton: {
-    backgroundColor: '#F56B5C',  // Cor do botão "Apagar" vermelho
+    backgroundColor: '#F56B5C',
     paddingVertical: 8,
     paddingHorizontal: 20,
     borderRadius: 8,
   },
+  editButton: {
+    backgroundColor: '#5CF56B',
+    paddingVertical: 8,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    marginLeft: 10,
+  },
   backButton: {
-    backgroundColor: '#5CF56B',  // Cor do botão "Voltar" verde
+    backgroundColor: '#5CF56B', // Cor do botão "Voltar" verde
     paddingVertical: 12,
     paddingHorizontal: 30,
     margin: 10,

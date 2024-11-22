@@ -1,22 +1,35 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
 
-// Defina o tipo de `onBack` para que o TypeScript saiba que é uma função que não recebe argumentos e não retorna nada.
 interface EditScreenProps {
   onBack: () => void;
+  item: { id: string; name: string }; // Dados do item a ser editado
+  onUpdate: (id: string, name: string) => void; // Função para atualizar o item
 }
 
-export default function EditScreen({ onBack }: EditScreenProps) {
+export default function EditScreen({ onBack, item, onUpdate }: EditScreenProps) {
+  const [name, setName] = useState(item.name);
+
+  useEffect(() => {
+    setName(item.name); // Atualiza o estado com o nome inicial do item
+  }, [item]);
+
+  const handleSave = () => {
+    onUpdate(item.id, name); // Atualiza o item na lista
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Editar Dados</Text>
       <TextInput
         style={styles.input}
-        placeholder="Edite aqui"
+        value={name}
+        onChangeText={setName}
+        placeholder="Edite o nome"
         placeholderTextColor="#888"
       />
       <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} onPress={() => {}}>
+        <TouchableOpacity style={styles.button} onPress={handleSave}>
           <Text style={styles.buttonText}>Salvar Alterações</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.button} onPress={onBack}>
