@@ -1,8 +1,10 @@
-import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
+import { initializeApp } from 'firebase/app';
+import { getAuth } from 'firebase/auth';
+import { getDatabase, ref, set, get, remove, child } from 'firebase/database';
 
 const firebaseConfig = {
   apiKey: "AIzaSyCmZTUN6iAS6j2YcJPgcXGevY3VMsB86Fw",
+  databaseURL: 'https://solarsense-83891-default-rtdb.firebaseio.com/',
   authDomain: "solarsense-83891.firebaseapp.com",
   projectId: "solarsense-83891",
   messagingSenderId: "188296302048",
@@ -11,3 +13,7 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
+
+// Configuração do Realtime Database
+const database = getDatabase(app);
+export { database, ref, set, get, remove, child };

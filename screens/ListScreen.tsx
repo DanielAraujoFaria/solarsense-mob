@@ -9,7 +9,7 @@ interface ListScreenProps {
 
 export default function ListScreen({ onBack, data, onDelete }: ListScreenProps) {
   const handleDelete = (id: string) => {
-    onDelete(id); // Chama a função de delete
+    onDelete(id); // Chama a função de delete que foi passada como prop
   };
 
   return (

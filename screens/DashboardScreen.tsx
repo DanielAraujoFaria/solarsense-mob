@@ -1,29 +1,76 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import ListScreen from './ListScreen';
 import InsertDataScreen from './InsertDataScreen';
 import EditScreen from './EditScreen';
+import { database, ref, set, get, child, remove } from '../services/firebaseConfig';
 
 export default function DashboardScreen() {
   const [screen, setScreen] = useState('dashboard');
   const [data, setData] = useState<{ id: string; name: string }[]>([]);
 
+  // Função para mudar a tela
   const handleIniciar = (screenName: string) => {
     setScreen(screenName);
   };
 
+  // Função para voltar ao dashboard
   const handleBack = () => {
     setScreen('dashboard');
   };
 
+  // Função para salvar um novo item no Firebase
   const handleSave = (name: string) => {
-    const newItem = { id: Date.now().toString(), name }; // Gerando um id único com base no timestamp
-    setData((prevData) => [...prevData, newItem]); // Adicionando o novo item à lista
+    const newItem = { name };
+    const newItemRef = ref(database, 'items/' + Date.now()); // Criando uma referência única
+    set(newItemRef, newItem) // Salvando o novo item no Firebase
+      .then(() => {
+        console.log('Item salvo com sucesso!');
+        setData((prevData) => [
+          ...prevData,
+          { id: newItemRef.key!, name }, // Adiciona o item à lista local
+        ]);
+      })
+      .catch((error) => {
+        console.error('Erro ao salvar item: ', error);
+      });
   };
 
+  // Função para deletar um item do Firebase
   const handleDelete = (id: string) => {
-    setData((prevData) => prevData.filter((item) => item.id !== id)); // Removendo o item da lista
+    const itemRef = ref(database, 'items/' + id); // Referência para o item específico
+    remove(itemRef) // Deleta o item
+      .then(() => {
+        console.log('Item removido com sucesso');
+        setData((prevData) => prevData.filter((item) => item.id !== id)); // Atualiza a lista local
+      })
+      .catch((error) => {
+        console.error('Erro ao remover item: ', error);
+      });
   };
+
+  // Carregar os dados do Firebase quando a tela de lista for aberta
+  useEffect(() => {
+    if (screen === 'list') {
+      const itemsRef = ref(database, 'items');
+      get(itemsRef)
+        .then((snapshot) => {
+          if (snapshot.exists()) {
+            const data = snapshot.val();
+            const itemsArray = Object.keys(data).map((key) => ({
+              id: key,
+              name: data[key].name,
+            }));
+            setData(itemsArray);
+          } else {
+            console.log('Nenhum dado encontrado!');
+          }
+        })
+        .catch((error) => {
+          console.error('Erro ao obter os dados: ', error);
+        });
+    }
+  }, [screen]);
 
   return (
     <View style={styles.container}>
