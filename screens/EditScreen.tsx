@@ -3,19 +3,19 @@ import { View, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-nativ
 
 interface EditScreenProps {
   onBack: () => void;
-  item: { id: string; name: string }; // Dados do item a ser editado
-  onUpdate: (id: string, name: string) => void; // Função para atualizar o item
+  item: { id: string; name: string };
+  onUpdate: (id: string, name: string) => void;
 }
 
 export default function EditScreen({ onBack, item, onUpdate }: EditScreenProps) {
   const [name, setName] = useState(item.name);
 
   useEffect(() => {
-    setName(item.name); // Atualiza o estado com o nome inicial do item
+    setName(item.name);
   }, [item]);
 
   const handleSave = () => {
-    onUpdate(item.id, name); // Atualiza o item na lista
+    onUpdate(item.id, name); 
   };
 
   return (

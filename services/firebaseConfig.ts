@@ -14,6 +14,5 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 
-// Configuração do Realtime Database
 const database = getDatabase(app);
 export { database, ref, set, get, remove, child };

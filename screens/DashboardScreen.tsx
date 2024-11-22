@@ -1,10 +1,9 @@
-// DashboardScreen.tsx
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import ListScreen from './ListScreen';
 import InsertDataScreen from './InsertDataScreen';
 import EditScreen from './EditScreen';
-import { database, ref, set, get, remove } from '../services/firebaseConfig'; // Importando corretamente
+import { database, ref, set, get, remove } from '../services/firebaseConfig'; 
 
 
 export default function DashboardScreen() {
@@ -12,7 +11,6 @@ export default function DashboardScreen() {
   const [data, setData] = useState<{ id: string; name: string }[]>([]);
   const [currentItem, setCurrentItem] = useState<{ id: string; name: string } | null>(null);
 
-  // Carregar dados do Firebase
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -34,17 +32,14 @@ export default function DashboardScreen() {
     fetchData();
   }, []);
 
-  // Navegar para a tela desejada
   const handleIniciar = (screenName: string) => {
     setScreen(screenName);
   };
 
-  // Voltar para a tela inicial
   const handleBack = () => {
     setScreen('dashboard');
   };
 
-  // Salvar novo item no Firebase
   const handleSave = async (name: string) => {
     const newItem = { name };
     try {
@@ -56,7 +51,6 @@ export default function DashboardScreen() {
     }
   };
 
-  // Deletar item do Firebase
   const handleDelete = async (id: string) => {
     try {
       const itemRef = ref(database, 'items/' + id);
@@ -67,7 +61,6 @@ export default function DashboardScreen() {
     }
   };
 
-  // Editar item no Firebase
   const handleEdit = (item: { id: string; name: string }) => {
     setCurrentItem(item);
     setScreen('edit');
@@ -97,9 +90,6 @@ export default function DashboardScreen() {
           </TouchableOpacity>
           <TouchableOpacity style={styles.button} onPress={() => handleIniciar('insert')}>
             <Text style={styles.buttonText}>Novo Painel</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.button} onPress={() => handleIniciar('edit')}>
-            <Text style={styles.buttonText}>Editar Painel</Text>
           </TouchableOpacity>
         </>
       ) : screen === 'list' ? (

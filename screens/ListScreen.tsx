@@ -3,18 +3,18 @@ import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native
 
 interface ListScreenProps {
   onBack: () => void;
-  data: { id: string; name: string }[];  // Dados passados como prop
-  onDelete: (id: string) => void; // Função para apagar o item
-  onEdit: (item: { id: string; name: string }) => void; // Função para editar o item
+  data: { id: string; name: string }[]; 
+  onDelete: (id: string) => void; 
+  onEdit: (item: { id: string; name: string }) => void; 
 }
 
 export default function ListScreen({ onBack, data, onDelete, onEdit }: ListScreenProps) {
   const handleDelete = (id: string) => {
-    onDelete(id); // Chama a função de delete
+    onDelete(id);
   };
 
   const handleEdit = (item: { id: string; name: string }) => {
-    onEdit(item); // Chama a função de editar
+    onEdit(item);
   };
 
   return (
@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   backButton: {
-    backgroundColor: '#5CF56B', // Cor do botão "Voltar" verde
+    backgroundColor: '#5CF56B',
     paddingVertical: 12,
     paddingHorizontal: 30,
     margin: 10,
