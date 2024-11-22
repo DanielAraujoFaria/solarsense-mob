@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import ListScreen from './ListScreen';
 import InsertDataScreen from './InsertDataScreen';
 import EditScreen from './EditScreen';
-import { database, ref, set, get, remove } from '../services/firebaseConfig'; 
-
+import LoginScreen from './LoginScreen'; // Importa a tela de Login
+import { auth } from '../services/firebaseConfig'; // Importa o Firebase auth
+import { database, ref, set, get, remove } from '../services/firebaseConfig';
 
 export default function DashboardScreen() {
   const [screen, setScreen] = useState('dashboard');
+  const [loggedIn, setLoggedIn] = useState(true); // Controle de login
   const [data, setData] = useState<{ id: string; name: string }[]>([]);
   const [currentItem, setCurrentItem] = useState<{ id: string; name: string } | null>(null);
 
@@ -32,72 +34,84 @@ export default function DashboardScreen() {
     fetchData();
   }, []);
 
-  const handleIniciar = (screenName: string) => {
-    setScreen(screenName);
-  };
-
-  const handleBack = () => {
-    setScreen('dashboard');
-  };
-
-  const handleSave = async (name: string) => {
-    const newItem = { name };
+  const handleLogout = async () => {
     try {
-      const newRef = ref(database, 'items/' + Date.now().toString());
-      await set(newRef, newItem);
-      setData((prevData) => [...prevData, { id: Date.now().toString(), name }]);
+      await auth.signOut(); // Firebase sign-out
+      setLoggedIn(false); // Redireciona para LoginScreen
     } catch (error) {
-      console.error('Error saving data:', error);
+      Alert.alert('Erro', 'Não foi possível sair da conta.');
+      console.error('Error logging out:', error);
     }
   };
 
-  const handleDelete = async (id: string) => {
-    try {
-      const itemRef = ref(database, 'items/' + id);
-      await remove(itemRef);
-      setData((prevData) => prevData.filter((item) => item.id !== id));
-    } catch (error) {
-      console.error('Error deleting item:', error);
-    }
-  };
-
-  const handleEdit = (item: { id: string; name: string }) => {
-    setCurrentItem(item);
-    setScreen('edit');
-  };
-
-  const handleUpdate = async (id: string, name: string) => {
-    try {
-      const itemRef = ref(database, 'items/' + id);
-      await set(itemRef, { name });
-      const updatedData = data.map((item) =>
-        item.id === id ? { ...item, name } : item
-      );
-      setData(updatedData);
-      setScreen('list');
-    } catch (error) {
-      console.error('Error updating data:', error);
-    }
-  };
+  if (!loggedIn) {
+    // Redireciona para o LoginScreen
+    return <LoginScreen />;
+  }
 
   return (
     <View style={styles.container}>
       {screen === 'dashboard' ? (
         <>
           <Text style={styles.title}>Bem-vindo ao SolarSense!</Text>
-          <TouchableOpacity style={styles.button} onPress={() => handleIniciar('list')}>
+          <TouchableOpacity style={styles.button} onPress={() => setScreen('list')}>
             <Text style={styles.buttonText}>Painéis</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.button} onPress={() => handleIniciar('insert')}>
+          <TouchableOpacity style={styles.button} onPress={() => setScreen('insert')}>
             <Text style={styles.buttonText}>Novo Painel</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={[styles.button, styles.logoutButton]} onPress={handleLogout}>
+            <Text style={styles.buttonText}>Sair</Text>
           </TouchableOpacity>
         </>
       ) : screen === 'list' ? (
-        <ListScreen onBack={handleBack} data={data} onDelete={handleDelete} onEdit={handleEdit} />
+        <ListScreen
+          onBack={() => setScreen('dashboard')}
+          data={data}
+          onDelete={async (id) => {
+            try {
+              await remove(ref(database, 'items/' + id));
+              setData((prevData) => prevData.filter((item) => item.id !== id));
+            } catch (error) {
+              console.error('Error deleting item:', error);
+            }
+          }}
+          onEdit={(item) => {
+            setCurrentItem(item);
+            setScreen('edit');
+          }}
+        />
       ) : screen === 'insert' ? (
-        <InsertDataScreen onBack={handleBack} onSave={handleSave} />
+        <InsertDataScreen
+          onBack={() => setScreen('dashboard')}
+          onSave={async (name) => {
+            const newItem = { name };
+            try {
+              const newRef = ref(database, 'items/' + Date.now().toString());
+              await set(newRef, newItem);
+              setData((prevData) => [...prevData, { id: Date.now().toString(), name }]);
+            } catch (error) {
+              console.error('Error saving data:', error);
+            }
+          }}
+        />
       ) : screen === 'edit' && currentItem ? (
-        <EditScreen onBack={handleBack} item={currentItem} onUpdate={handleUpdate} />
+        <EditScreen
+          onBack={() => setScreen('list')}
+          item={currentItem}
+          onUpdate={async (id, name) => {
+            try {
+              await set(ref(database, 'items/' + id), { name });
+              const updatedData = data.map((item) =>
+                item.id === id ? { ...item, name } : item
+              );
+              setData(updatedData);
+              setScreen('list');
+            } catch (error) {
+              console.error('Error updating data:', error);
+            }
+          }}
+        />
       ) : null}
     </View>
   );
@@ -123,6 +137,9 @@ const styles = StyleSheet.create({
     margin: 10,
     borderRadius: 8,
     alignItems: 'center',
+  },
+  logoutButton: {
+    backgroundColor: '#FF5C5C',
   },
   buttonText: {
     color: '#fff',
